@@ -1,0 +1,75 @@
+version: '3.8'
+
+services:
+  db:
+    image: ankane/pgvector:v0.5.1
+    container_name: whatsapp_agent_db
+    environment:
+      POSTGRES_DB: whatsapp_agent
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d whatsapp_agent"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  django:
+    build:
+      context: .
+      dockerfile: infra/docker/django.Dockerfile
+    container_name: whatsapp_agent_django
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgres://postgres:postgrespassword@db:5432/whatsapp_agent
+      - DJANGO_SECRET=django-insecure-secret-key-for-local-dev
+      - APP_ENV=local
+    env_file:
+      - .env.local
+    depends_on:
+      db:
+        condition: service_healthy
+
+  fastapi:
+    build:
+      context: .
+      dockerfile: infra/docker/fastapi.Dockerfile
+    container_name: whatsapp_agent_fastapi
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgres://postgres:postgrespassword@db:5432/whatsapp_agent
+      - FASTAPI_SECRET=fastapi-secret-key-for-local-dev
+      - APP_ENV=local
+    env_file:
+      - .env.local
+    depends_on:
+      db:
+        condition: service_healthy
+
+  nextjs:
+    build:
+      context: .
+      dockerfile: infra/docker/nextjs.Dockerfile
+    container_name: whatsapp_agent_nextjs
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/apps/admin/node_modules
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    depends_on:
+      - django
+
+volumes:
+  pgdata:
