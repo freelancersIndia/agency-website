@@ -9,6 +9,8 @@ class JSONFormatter(logging.Formatter):
     Custom formatter that transforms Python log records into structured JSON payloads.
     """
     def format(self, record: logging.LogRecord) -> str:
+        from shared.logging.tracing import get_request_id
+        
         log_payload: Dict[str, Any] = {
             "timestamp": datetime.utcnow().isoformat() + "Z",
             "level": record.levelname,
@@ -16,6 +18,10 @@ class JSONFormatter(logging.Formatter):
             "name": record.name,
             "file": f"{record.pathname}:{record.lineno}"
         }
+        
+        req_id = get_request_id()
+        if req_id:
+            log_payload["request_id"] = req_id
 
         if record.exc_info:
             log_payload["exception"] = self.formatException(record.exc_info)

@@ -36,3 +36,27 @@ customers/
 ```
 * **Core Runtime** reads configurations from these folders.
 * Under no circumstances is a customer module allowed to import from another customer module, nor from direct infrastructure.
+
+---
+
+## Phase 1 Specifications: WhatsApp Transport Layer
+
+The WhatsApp Transport Layer is structured cleanly into modules inside `core/whatsapp`, `core/conversation`, and `apps/webhook`.
+
+### 1. Inbound Ingestion & Validation
+* **Endpoint**: `POST /api/v1/webhook`
+* **Signature Verification**: Validates requests using HMAC-SHA256 signatures in headers (`X-Hub-Signature-256`) against the `META_TOKEN` secret key.
+* **Audit Logging**: Saves raw inbound webhook payloads to the `events` table (status: `received`).
+* **Normalization**: The `WhatsAppPayloadParser` converts different Meta message variants (text, media, reactions, read/delivery indicators) into structured `MessageDTO` records.
+
+### 2. Session Persistence
+* **Database Tables**:
+  * `conversations`: Manages ongoing user chat sessions. Sessions are reopened automatically when new events arrive.
+  * `messages`: Appends all sent/received logs related to specific active conversations. Includes `whatsapp_id` to enforce message deduplication and guarantee idempotency.
+  * `events`: Audits incoming webhook updates.
+* **Access Patterns**: Separated from views and business workflows using repositories (`ConversationRepository`, `MessageRepository`).
+
+### 3. Outbound Dispatches & Resiliency
+* **Gateway**: `WhatsAppMessageSender` manages REST transactions with Meta Cloud API.
+* **Exponential Backoff Retry**: Wrapped inside `execute_with_retry` to recover from temporary network exceptions or rate limits.
+* **Observability**: Automatically generates UUIDs (`X-Request-ID`) and propagates them through thread-local scopes to attach transaction paths to all generated JSON logs.

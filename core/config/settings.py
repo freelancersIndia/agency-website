@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "core.whatsapp",
     "core.conversation",
     "core.workflow",
+    "apps.webhook",
 ]
 
 MIDDLEWARE = [
@@ -59,17 +60,26 @@ TEMPLATES = [
 WSGI_APPLICATION = "core.config.wsgi.application"
 
 # Parse postgres DATABASE_URL string
-url = urlparse(settings_env.DATABASE_URL)
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": url.path[1:],
-        "USER": url.username,
-        "PASSWORD": url.password,
-        "HOST": url.hostname,
-        "PORT": url.port or 5432,
+import sys
+if "test" in sys.argv:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",
+        }
     }
-}
+else:
+    url = urlparse(settings_env.DATABASE_URL)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": url.path[1:],
+            "USER": url.username,
+            "PASSWORD": url.password,
+            "HOST": url.hostname,
+            "PORT": url.port or 5432,
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},

@@ -1,7 +1,6 @@
-# Phase 0 Tasks Board
+# Monolith Tasks Board
 
-Track and checklist for the current execution cycle of Phase 0.
-
+## Phase 0 — Monolith Foundation
 - [x] **TASK 0.1 — Repository Initialization** (Documentation, Licensing, Metadata)
 - [x] **TASK 0.2 — Repository Architecture** (Folder boundaries and Decoupling rules)
 - [x] **TASK 0.3 — Developer Environment** (Docker, Docker Compose, Makefile, boot scripts)
@@ -13,3 +12,19 @@ Track and checklist for the current execution cycle of Phase 0.
 - [x] **TASK 0.9 — Secrets** (Dynamic loader, rotation hooks)
 - [x] **TASK 0.10 — CI** (GitHub Actions build checks and static test runs)
 - [x] **TASK 0.11 — Developer Experience** (Linters, formatting configurations, pre-commit)
+
+## Phase 1 — WhatsApp Transport Layer
+- [x] **TASK 1.1 — WhatsApp Module Foundation** (Structure isolation)
+- [x] **TASK 1.2 — Conversation Module** (Sub-package and trackers)
+- [x] **TASK 1.3 — Webhook Endpoint** (POST /webhook with signatures verification)
+- [x] **TASK 1.4 — Incoming Message Parser** (Event DTO normalizations)
+- [x] **TASK 1.5 — Persistence Layer** (Model migrations for conversations, messages, events)
+- [x] **TASK 1.6 — Conversation Service** (State management operations service)
+- [x] **TASK 1.7 — Outgoing Messaging** (Meta endpoint send integrations)
+- [x] **TASK 1.8 — Status Tracking** (Message status updates persistence)
+- [x] **TASK 1.9 — Media Handling** (Upload/Download media services)
+- [x] **TASK 1.10 — Retry Layer** (Exponential backoff retries helper)
+- [x] **TASK 1.11 — Validation Layer** (Header & payload checks)
+- [x] **TASK 1.12 — Transport Observability** (Request ID thread-local logs injection)
+- [x] **TASK 1.13 — Testing** (Django unit & integration tests)
+- [x] **TASK 1.14 — Documentation Updates** (System specification and specs synced)

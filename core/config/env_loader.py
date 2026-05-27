@@ -21,6 +21,7 @@ class AppSettings(BaseSettings):
     # Integrations
     OPENAI_KEY: str
     META_TOKEN: str
+    META_PHONE_NUMBER_ID: str = Field(default="105581175654321")
     EMAIL_KEY: str
 
     model_config = SettingsConfigDict(
